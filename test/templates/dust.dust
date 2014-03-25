@@ -1,0 +1,22 @@
+{#global}
+  hey {ho} let's {>"nested/partial/go"/}
+
+  {#emptylist}
+    I hope nobody's taping this!
+  {/emptylist}
+
+  {#stringlist}
+    {.|s}
+  {/stringlist}
+
+{/global}
+
+{~n}
+
+{>"layouts/base"/}
+{<title}
+  Child Title
+{/title}
+{<main}
+  Child Content
+{/main}

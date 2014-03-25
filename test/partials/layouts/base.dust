@@ -1,0 +1,10 @@
+Start{~n}
+{+title}
+  Base Title
+{/title}
+{~n}
+{+main}
+  Base Content
+{/main}
+{~n}
+End
