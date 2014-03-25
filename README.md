@@ -66,31 +66,35 @@ Not yet implemented.
 Detailed doc coming soon..
 Check the test in the repo!
 
-  grunt.initConfig({
-    embrace: {
-      options: {
-        render: true,
-        compile: false,
-        data: "test/data/*.json",
-        partials: "test/partials/**/*.*",
-        mustache: "test/helpers/mustache/*.js",
-        handlebars: "test/helpers/handlebars/*.js",
-        dust: "test/helpers/dust/*.js",
-        swig: "test/helpers/swig/*.js"
-      },
-      render: {
-        expand: true,
-        cwd: "test/templates",
-        src: [
-          "*.mustache",
-          "*.hbs",
-          "*.swig",
-          "*.dust"
-        ],
-        dest: "test/rendered/"
-      }
+```js
+
+grunt.initConfig({
+  embrace: {
+    options: {
+      render: true,
+      compile: false,
+      data: "test/data/*.json",
+      partials: "test/partials/**/*.*",
+      mustache: "test/helpers/mustache/*.js",
+      handlebars: "test/helpers/handlebars/*.js",
+      dust: "test/helpers/dust/*.js",
+      swig: "test/helpers/swig/*.js"
+    },
+    render: {
+      expand: true,
+      cwd: "test/templates",
+      src: [
+        "*.mustache",
+        "*.hbs",
+        "*.swig",
+        "*.dust"
+      ],
+      dest: "test/rendered/"
     }
-  })
+  }
+})
+
+```
 
 ## Licence
 
