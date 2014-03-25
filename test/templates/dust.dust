@@ -1,22 +1,30 @@
+{! scoping !}
 {#global}
-  hey {ho} let's {>"nested/partial/go"/}
 
-  {#emptylist}
+  {! variable !} {! (nested) partial !}
+  hey {ho} let's {>"nested/partial/go"/}{~n}
+
+  {! empty list !}
+  {?emptylist}
+    {#emptylist}
+      {.}
+    {/emptylist}
+  {:else}
     I hope nobody's taping this!
   {/emptylist}
 
+  {! list !}
   {#stringlist}
-    {.|s}
+    {.|s}{~n}
   {/stringlist}
 
 {/global}
 
-{~n}
-
-{>"layouts/base"/}
+{! inheritance !}
+{>"layouts/extended"/}
 {<title}
   Child Title
 {/title}
-{<main}
+{<content}
   Child Content
-{/main}
+{/content}
