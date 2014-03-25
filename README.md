@@ -40,8 +40,57 @@ Doc coming soon..
 
 ## Grunt task
 
+### options
+
+#### render
+
+Render files with the given context.
+
+#### compile
+
+Precompile files into javascript.
+
+#### data
+
+These will be merged into a global context and will be passed to each template.
+The file names will be used for root field names.
+
+#### partials
+
+Iclude/import/partial paths will be looked among these files.
+
+#### helpers
+
+Not yet implemented.
+
 Detailed doc coming soon..
 Check the test in the repo!
+
+  grunt.initConfig({
+    embrace: {
+      options: {
+        render: true,
+        compile: false,
+        data: "test/data/*.json",
+        partials: "test/partials/**/*.*",
+        mustache: "test/helpers/mustache/*.js",
+        handlebars: "test/helpers/handlebars/*.js",
+        dust: "test/helpers/dust/*.js",
+        swig: "test/helpers/swig/*.js"
+      },
+      render: {
+        expand: true,
+        cwd: "test/templates",
+        src: [
+          "*.mustache",
+          "*.hbs",
+          "*.swig",
+          "*.dust"
+        ],
+        dest: "test/rendered/"
+      }
+    }
+  })
 
 ## Licence
 
