@@ -1,7 +1,6 @@
 embrace
 =======
 
-
 Embrace is an adapter that provides a standalone api for rendering and compiling templates.
 An additional grunt task is also exposed.
 
@@ -36,7 +35,7 @@ but hard to find in other engines. Such as template inharitance.
 
 ## API
 
-Doc coming soon..
+Doc coming soon.. until then, the source is commented where it's applicable.
 
 ## Grunt task
 
@@ -44,22 +43,48 @@ Doc coming soon..
 
 #### render
 
+Type: `Boolean`
+
+Default: `true`
+
 Render files with the given context.
 
 #### compile
 
+Type: `Boolean`
+
+Default: `false`
+
 Precompile files into javascript.
 
 #### data
+
+Type: `String`
+
+Default: `""`
+
+A globbing pattern that collects `*.json` files.
 
 These will be merged into a global context and will be passed to each template.
 The file names will be used for root field names.
 
 #### partials
 
+Type: `String`
+
+Default: `""`
+
+A globbing pattern that collects template files.
+
 Iclude/import/partial paths will be looked among these files.
 
 #### helpers
+
+Type: `String`
+
+Default: `""`
+
+A globbing pattern that collects `*.js` files.
 
 Not yet implemented.
 
