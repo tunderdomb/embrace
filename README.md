@@ -78,6 +78,19 @@ A globbing pattern that collects template files.
 
 Iclude/import/partial paths will be looked among these files.
 
+#### partialsRoot
+
+Type: `String`
+
+Default: `""`
+
+The path part that will be ignored when looking up partials.
+
+If you match partials `"nested/folder/partials/*.mustache"`
+you would have to refer partials in your templates with their full path: `{{>nested/folder/partials/apartial}}`
+With this option, you can set a path part that will be excluded from partial resolution.
+E.g. `partialsRoot: "nested/folder/partials/"`. Now you can just refer to templates as `{{>apartial}}`
+
 #### helpers
 
 Type: `String`

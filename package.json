@@ -1,6 +1,6 @@
 {
   "name": "grunt-embrace",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Template adapter to render and compile Mustache, Handlebars, Dust and Swig templates",
   "main": "embrace.js",
   "scripts": {

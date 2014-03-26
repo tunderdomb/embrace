@@ -15,6 +15,7 @@ module.exports = function ( grunt ){
     var options = this.options({
       render: true,
       compile: false,
+      partialsRoot: "",
       partials: "",
       data: "",
       mustache: "",
@@ -31,7 +32,7 @@ module.exports = function ( grunt ){
 
     var templates = embrace(options.setup)
 
-    templates.addPartials(grunt.file.expand(options.partials), "test/partials/")
+    templates.addPartials(grunt.file.expand(options.partials), options.partialsRoot)
     templates.data(grunt.file.expand(options.data))
 
     templates.mustache(grunt.file.expand(options.mustache))

@@ -6,11 +6,14 @@ module.exports = function ( grunt ){
         render: true,
         compile: false,
         data: "test/data/*.json",
+        partialsRoot: "test/partials/",
         partials: "test/partials/**/*.*",
-        mustache: "test/helpers/mustache/*.js",
-        handlebars: "test/helpers/handlebars/*.js",
-        dust: "test/helpers/dust/*.js",
-        swig: "test/helpers/swig/*.js"
+        helpers: {
+          mustache: "test/helpers/mustache/*.js",
+          handlebars: "test/helpers/handlebars/*.js",
+          dust: "test/helpers/dust/*.js",
+          swig: "test/helpers/swig/*.js"
+        }
       },
       render: {
         expand: true,
