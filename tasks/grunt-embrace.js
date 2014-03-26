@@ -32,13 +32,13 @@ module.exports = function ( grunt ){
 
     var templates = embrace(options.setup)
 
-    templates.addPartials(grunt.file.expand(options.partials), options.partialsRoot)
-    templates.data(grunt.file.expand(options.data))
+    if( options.partials ) templates.addPartials(grunt.file.expand(options.partials), options.partialsRoot)
+    if( options.data ) templates.data(grunt.file.expand(options.data))
 
-    templates.mustache(grunt.file.expand(options.mustache))
-    templates.handlebars(grunt.file.expand(options.handlebars))
-    templates.dust(grunt.file.expand(options.dust))
-    templates.swig(grunt.file.expand(options.swig))
+    if( options.mustache ) templates.mustache(grunt.file.expand(options.mustache))
+    if( options.handlebars ) templates.handlebars(grunt.file.expand(options.handlebars))
+    if( options.dust ) templates.dust(grunt.file.expand(options.dust))
+    if( options.swig ) templates.swig(grunt.file.expand(options.swig))
 
 
     var sources = []
