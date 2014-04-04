@@ -2,11 +2,13 @@ var path = require("path")
 var fs = require("fs")
 
 /**
- * @return Adapter
+ * @return {Adapter}
  * */
-var embrace = module.exports = function ( setup ){
+function embrace( setup ){
   return new Adapter(setup)
 }
+
+module.exports = embrace
 
 var mustache = embrace.mustache = require("mustache")
 var handlebars = embrace.handlebars = require("handlebars")
@@ -46,6 +48,13 @@ embrace.read = function ( src ){
 
 embrace.nameOf = function ( src ){
   return path.basename(src, path.extname(src))
+}
+
+embrace.extend = function( obj, extension ){
+  for( var prop in extension ){
+    obj[prop] = extension[prop]
+  }
+  return obj
 }
 
 embrace.merge = function ( obj, extension ){
@@ -90,9 +99,11 @@ embrace.loadPartial = function ( partials, partialName, engine, src ){
 /**
  * resolve a partial name to a proper path part
  * @example
- * root = "res/partials/"
- * src = "res/partials/services/blabla.mustache"
+ *
+ * var root = "res/partials/"
+ *   , src = "res/partials/services/blabla.mustache"
  * resolvePartialName( src, root ) -> services/blabla
+ *
  * @param src{String} the full partial source from the partials list (Adapter.partials)
  * @param root{String} the partials' root folder
  * */
@@ -200,7 +211,6 @@ function Adapter( setup ){
     }
   }})
 
-
   // By default Dust returns a "template not found" error
   // when a named template cannot be located in the cache.
   // Override onLoad to specify a fallback loading mechanism
@@ -208,9 +218,15 @@ function Adapter( setup ){
   dust.onLoad = function ( name, cb ){
     cb(null, embrace.loadPartial(template.partials, name, "dust", template.currentDustTemplate))
   }
+
   setup && setup(this, embrace)
 }
-Adapter.prototype = {}
+Adapter.prototype = {
+  useMustache: false,
+  useHandlebars: false,
+  useSwig: false,
+  useDust: false
+}
 
 /**
  * @param locations{String[]} a list of partial file paths
@@ -249,22 +265,22 @@ Adapter.prototype.addPartials = function ( locations, root ){
 /** ====================
  *  helper/filter registrators
  * ==================== */
-Adapter.prototype.mustache = function ( sources ){
+Adapter.prototype.helpMustache = function ( sources ){
   sources.forEach(function ( src ){
 
   })
 }
-Adapter.prototype.handlebars = function ( sources ){
+Adapter.prototype.helpHandlebars = function ( sources ){
   sources.forEach(function ( src ){
 
   })
 }
-Adapter.prototype.dust = function ( sources ){
+Adapter.prototype.helpDust = function ( sources ){
   sources.forEach(function ( src ){
 
   })
 }
-Adapter.prototype.swig = function ( sources ){
+Adapter.prototype.helpSwig = function ( sources ){
   sources.forEach(function ( src ){
 
   })

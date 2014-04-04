@@ -7,21 +7,41 @@
  */
 
 var async = require("async")
+var path = require("path")
 var embrace = require("../embrace")
 
 module.exports = function ( grunt ){
+
+  function doTheThing( setup, options ){
+
+    var adapter = embrace(setup, options)
+    if( options.partials )
+      adapter.addPartials(grunt.file.expand(path.join(options.cwd||"",options.partials)), options.cwd)
+    if( options.data )
+      adapter.data(grunt.file.expand(options.data))
+
+    if( options.mustache )
+      adapter.helpMustache(grunt.file.expand(options.mustache))
+    if( options.handlebars )
+      adapter.helpHandlebars(grunt.file.expand(options.handlebars))
+    if( options.dust )
+      adapter.helpDust(grunt.file.expand(options.dust))
+    if( options.swig )
+      adapter.helpSwig(grunt.file.expand(options.swig))
+  }
+
   grunt.registerMultiTask("embrace", "Render mustache templates", function (){
 
     var options = this.options({
-      render: true,
+      render: false,
       compile: false,
-      partialsRoot: "",
-      partials: "",
       data: "",
-      mustache: "",
-      handlebars: "",
-      dust: "",
-      swig: "",
+      helpers: "",
+      resolve: "",
+      helpMustache: "",
+      helpHandlebars: "",
+      helpDust: "",
+      helpSwig: "",
       setup: null
     })
 
@@ -30,18 +50,28 @@ module.exports = function ( grunt ){
       return
     }
 
-    var templates = embrace(options.setup)
+    var adapter = embrace(options.setup)
 
-    if( options.partials ) templates.addPartials(grunt.file.expand(options.partials), options.partialsRoot)
-    if( options.data ) templates.data(grunt.file.expand(options.data))
+    if( options.partials ){
+      var partials = options.resolve
+        ? path.join(options.resolve , options.partials)
+        : options.partials
+      adapter.addPartials(grunt.file.expand(partials), options.resolve)
+    }
+    if( options.data )
+      adapter.data(grunt.file.expand(options.data))
 
-    if( options.mustache ) templates.mustache(grunt.file.expand(options.mustache))
-    if( options.handlebars ) templates.handlebars(grunt.file.expand(options.handlebars))
-    if( options.dust ) templates.dust(grunt.file.expand(options.dust))
-    if( options.swig ) templates.swig(grunt.file.expand(options.swig))
-
+    if( options.helpMustache )
+      adapter.helpMustache(grunt.file.expand(options.helpMustache))
+    if( options.helpHandlebars )
+      adapter.helpHandlebars(grunt.file.expand(options.helpHandlebars))
+    if( options.helpDust )
+      adapter.helpDust(grunt.file.expand(options.helpDust))
+    if( options.helpSwig )
+      adapter.helpSwig(grunt.file.expand(options.helpSwig))
 
     var sources = []
+
     this.files.forEach(function ( filePair ){
       sources = filePair.src
         .filter(function( src ){
@@ -63,12 +93,12 @@ module.exports = function ( grunt ){
       var content = grunt.file.read(src)
 
       if ( options.compile ) {
-        templates.compile(src, content, function( err, compiled ){
+        adapter.compile(src, content, function( err, compiled ){
           if( !err ) grunt.file.write(file.dest, compiled)
         })
       }
-      else {
-        templates.render(src, content, function( err, rendered ){
+      else if( options.render ) {
+        adapter.render(src, content, function( err, rendered ){
           if( !err ) {
             grunt.file.write(file.dest, rendered)
             console.log("Rendered '"+file.dest+"'")
@@ -79,7 +109,7 @@ module.exports = function ( grunt ){
         })
       }
     }, function( err ){
-      done(err ? err : false)
+      done(err||false)
     })
   })
 };

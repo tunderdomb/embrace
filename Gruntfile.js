@@ -2,36 +2,41 @@ module.exports = function ( grunt ){
 
   grunt.initConfig({
     embrace: {
+//      _options: {
+//        render: true,
+//        compile: false,
+//        data: "test/data/*.json",
+//        partialsRoot: "test/partials/",
+//        partials: "test/partials/**/*.*",
+//        mustache: "test/helpers/mustache/*.js",
+//        handlebars: "test/helpers/handlebars/*.js",
+//        dust: "test/helpers/dust/*.js",
+//        swig: "test/helpers/swig/*.js"
+//      },
       options: {
-        render: true,
-        compile: false,
         data: "test/data/*.json",
-        partialsRoot: "test/partials/",
-        partials: "test/partials/**/*.*",
-        mustache: "test/helpers/mustache/*.js",
-        handlebars: "test/helpers/handlebars/*.js",
-        dust: "test/helpers/dust/*.js",
-        swig: "test/helpers/swig/*.js"
+        helpers: "test/helpers/dust/*.js",
+        resolve: "test/partials/",
+        partials: "**/*.dust",
+        setup: function( adapter, embrace ){
+
+        }
       },
-      render: {
+//      compileDust: {
+//        options: {compile: true},
+//        expand: true,
+//        cwd: "test/templates",
+//        src: ["*.dust"],
+//        dest: "test/compiled/",
+//        ext: ".js"
+//      },
+      renderDust: {
+        options: {render: true},
         expand: true,
         cwd: "test/templates",
-        src: [
-          "*.mustache",
-          "*.hbs",
-          "*.swig",
-          "*.dust"
-        ],
+        src: ["*.dust"],
         dest: "test/rendered/"
-      },
-//      compile: {
-//        options: {
-//          compile: true
-//        },
-//        cwd: "test/templates",
-//        src: "*.mustache",
-//        dest: "test/compiled"
-//      }
+      }
     },
     clean: {
       test: {
