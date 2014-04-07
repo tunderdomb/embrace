@@ -1,0 +1,1 @@
+(function(){dust.register("layouts/base",body_0);function body_0(chk,ctx){return chk.write("Start\n").block(ctx.getBlock("title"),ctx,{"block":body_1},null).write("\n").block(ctx.getBlock("main"),ctx,{"block":body_2},null).write("\nEnd");}function body_1(chk,ctx){return chk.write("Base Title");}function body_2(chk,ctx){return chk.write("Base Content");}return body_0;})();

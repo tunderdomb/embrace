@@ -1,0 +1,1 @@
+(function(){dust.register("layouts/extended",body_0);var blocks={"main":body_1};function body_0(chk,ctx){ctx=ctx.shiftBlocks(blocks);return chk.partial("layouts/base",ctx,null);}function body_1(chk,ctx){ctx=ctx.shiftBlocks(blocks);return chk.partial("nested/partial/extension",ctx,null).write("\n").block(ctx.getBlock("content"),ctx,{},null);}return body_0;})();

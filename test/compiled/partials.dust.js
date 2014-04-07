@@ -1,0 +1,5 @@
+(function(){dust.register("go",body_0);function body_0(chk,ctx){return chk.reference(ctx.get(["go"], false),ctx,"h");}return body_0;})();;
+(function(){dust.register("layouts/base",body_0);function body_0(chk,ctx){return chk.write("Start\n").block(ctx.getBlock("title"),ctx,{"block":body_1},null).write("\n").block(ctx.getBlock("main"),ctx,{"block":body_2},null).write("\nEnd");}function body_1(chk,ctx){return chk.write("Base Title");}function body_2(chk,ctx){return chk.write("Base Content");}return body_0;})();;
+(function(){dust.register("layouts/extended",body_0);var blocks={"main":body_1};function body_0(chk,ctx){ctx=ctx.shiftBlocks(blocks);return chk.partial("layouts/base",ctx,null);}function body_1(chk,ctx){ctx=ctx.shiftBlocks(blocks);return chk.partial("nested/partial/extension",ctx,null).write("\n").block(ctx.getBlock("content"),ctx,{},null);}return body_0;})();;
+(function(){dust.register("nested/partial/extension",body_0);function body_0(chk,ctx){return chk.write("Extended Content");}return body_0;})();;
+(function(){dust.register("nested/partial/go",body_0);function body_0(chk,ctx){return chk.reference(ctx.get(["go"], false),ctx,"h");}return body_0;})();

@@ -4,6 +4,9 @@ embrace
 Embrace is an adapter that provides a standalone api for rendering and compiling templates.
 An additional grunt task is also exposed.
 
+Embrace helps compile and render templates, with or without a data context, register partials,
+and copy browser side libraries in to place.
+
 ## Engines
 
 ### Mustache
@@ -41,7 +44,24 @@ Doc coming soon.. until then, the source is commented where it's applicable.
 
 ### options
 
-#### render
+#### options.client
+
+Type: `String`
+
+Default: `""`
+
+A directory path where to copy the client side embrace script.
+
+
+#### options.dust.client
+
+Type: `String`
+
+Default: `""`
+
+A directory path where to copy the dust client side library.
+
+#### options.render
 
 Type: `Boolean`
 
@@ -49,7 +69,7 @@ Default: `true`
 
 Render files with the given context.
 
-#### compile
+#### options.compile
 
 Type: `Boolean`
 
@@ -57,7 +77,7 @@ Default: `false`
 
 Precompile files into javascript.
 
-#### data
+#### options.data
 
 Type: `String`
 
@@ -68,17 +88,7 @@ A globbing pattern that collects `*.json` files.
 These will be merged into a global context and will be passed to each template.
 The file names will be used for root field names.
 
-#### partials
-
-Type: `String`
-
-Default: `""`
-
-A globbing pattern that collects template files.
-
-Iclude/import/partial paths will be looked among these files.
-
-#### partialsRoot
+#### options.resolve
 
 Type: `String`
 
@@ -91,46 +101,93 @@ you would have to refer partials in your templates with their full path: `{{>nes
 With this option, you can set a path part that will be excluded from partial resolution.
 E.g. `partialsRoot: "nested/folder/partials/"`. Now you can just refer to templates as `{{>apartial}}`
 
-#### helpers
+#### options.partials
 
 Type: `String`
 
 Default: `""`
 
-A globbing pattern that collects `*.js` files.
+A globbing pattern that collects template files.
+The pattern is relative to the `resolve` options.
 
-Not yet implemented.
+Include/import/partial paths will be looked among these files.
 
-Detailed doc coming soon..
-Check the test in the repo!
+#### options.setup
+
+Type: `Function`
+
+Default: `null`
+
+A function receiving the template adapter and the embrace object `setup(Adapter adapter, Object embrace)`
+
+### Compile
 
 ```js
 
-grunt.initConfig({
-  embrace: {
-    options: {
-      render: true,
-      compile: false,
-      data: "test/data/*.json",
-      partials: "test/partials/**/*.*",
-      mustache: "test/helpers/mustache/*.js",
-      handlebars: "test/helpers/handlebars/*.js",
-      dust: "test/helpers/dust/*.js",
-      swig: "test/helpers/swig/*.js"
-    },
-    render: {
-      expand: true,
-      cwd: "test/templates",
-      src: [
-        "*.mustache",
-        "*.hbs",
-        "*.swig",
-        "*.dust"
-      ],
-      dest: "test/rendered/"
+  grunt.initConfig({
+    embrace: {
+      options: {
+        client: "test/embrace/",
+        data: "test/data/*.json",
+        helpers: "test/helpers/dust/*.js",
+        resolve: "test/partials/",
+        partials: "**/*.dust",
+        dust: {
+          helpers: "",
+          client: "test/embrace/"
+        },
+        setup: function( adapter, embrace ){}
+      },
+      compileDust: {
+        options: {compile: true},
+        expand: true,
+        cwd: "test/",
+        src: ["**/*.dust"],
+        dest: "test/compiled/",
+        ext: ".js"
+      },
+      compileAndConcatDust: {
+        options: {
+          compile: true,
+          concat: true
+        },
+        files: {
+          "test/compiled/partials.dust.js": "test/partials/**/*.dust",
+          "test/compiled/templates.dust.js": "test/templates/**/*.dust"
+        }
+      }
     }
-  }
-})
+  })
+
+```
+
+### Render
+
+```js
+
+  grunt.initConfig({
+    embrace: {
+      options: {
+        client: "test/embrace/",
+        data: "test/data/*.json",
+        helpers: "test/helpers/dust/*.js",
+        resolve: "test/partials/",
+        partials: "**/*.dust",
+        dust: {
+          helpers: "",
+          client: "test/embrace/"
+        },
+        setup: function( adapter, embrace ){}
+      }
+      renderDust: {
+        options: {render: true},
+        expand: true,
+        cwd: "test/templates",
+        src: ["*.dust"],
+        dest: "test/rendered/"
+      }
+    }
+  })
 
 ```
 

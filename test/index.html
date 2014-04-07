@@ -1,0 +1,25 @@
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Embrace</title>
+</head>
+<body>
+
+
+<script type="text/javascript" src="../dist/embrace.js"></script>
+<script type="text/javascript" src="../engines/dust/dust-core.js"></script>
+<script type="text/javascript">
+  debugger
+  embrace([
+    "compiled/partials.dust.js",
+    "compiled/templates.dust.js"
+  ], function(  ){
+    debugger
+    dust.render("dust", {}, function(err, out) {
+      debugger
+      console.log(out)
+    })
+  })
+</script>
+</body>
+</html>

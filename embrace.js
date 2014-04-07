@@ -1,5 +1,6 @@
 var path = require("path")
 var fs = require("fs")
+var mkdirp = require("mkdirp")
 
 /**
  * @return {Adapter}
@@ -14,6 +15,49 @@ var mustache = embrace.mustache = require("mustache")
 var handlebars = embrace.handlebars = require("handlebars")
 var swig = embrace.swig = require("swig")
 var dust = embrace.dust = require("dustjs-linkedin")
+
+function copy( src, dest ){
+  mkdirp.sync(path.dirname(dest))
+  fs.createReadStream(src)
+    .pipe(fs.createWriteStream(dest))
+  console.log("Embraced client: '%s'", dest)
+}
+
+function enginePath( engineName, file ){
+  return path.join(__dirname, "engines", engineName, file)
+}
+
+embrace.copyEngine = function( engine, dest ){
+  function doCopy( clientScript ){
+    var destScript = path.join(process.cwd(), dest, clientScript)
+    if ( !fs.existsSync(destScript) ) {
+      copy(enginePath(engine, clientScript), destScript)
+    }
+  }
+  switch( engine ){
+    case "mustache":
+      break
+    case "handlebars":
+      break
+    case "dust":
+      [
+        "dust-core.js", "dust-core.min.js", "dust-full.js", "dust-full.min.js"
+      ].forEach(doCopy)
+      break
+    case "swig":
+      [
+        "swig.js", "swig.min.js"
+      ].forEach(doCopy)
+      break
+  }
+}
+
+embrace.copyClient = function( dest ){
+  dest = path.join(process.cwd(), dest, "embrace.js")
+  if ( !fs.existsSync(dest) ) {
+    copy(path.join(__dirname, "dist", "embrace.js"), dest)
+  }
+}
 
 /**
  * @param src {String}
@@ -159,20 +203,29 @@ render.swig = function ( src, content, done ){
  * ==================== */
 var compile = embrace.compile = {}
 
-compile.mustache = function ( src, content, context, partials, done ){
+compile.mustache = function ( src, content, done ){
 
 }
 
-compile.hbs = function ( src, content, context, partials, done ){
-  var template = Handlebars.compile(content)
-  template(context)
+compile.hbs = function ( src, content, done ){
+//  var template = Handlebars.compile(content)
+//  template(context)
 }
 
-compile.dust = function ( src, content, context, partials, done ){
-
+compile.dust = function ( src, content, done ){
+  var partial = this.getPartialBySrc(src)
+    , name
+  if ( partial ) {
+    name = partial.name
+  }
+  else {
+    name = embrace.nameOf(src)
+  }
+  var compiled = dust.compile(content, name)
+  done(null, compiled)
 }
 
-compile.swig = function ( src, content, context, partials, done ){
+compile.swig = function ( src, content, done ){
 
 }
 
@@ -180,12 +233,16 @@ compile.swig = function ( src, content, context, partials, done ){
  * Adapter
  * constructor for a template object
  * */
-function Adapter( setup ){
+function Adapter( options ){
+  options = options || {}
   var template = this
-  template.context = {}
-  template.partials = []
-  template.currentSwigTemplate = null
-  template.currentDustTemplate = null
+
+  this.resolve = options.resolve || ""
+
+  this.context = {}
+  this.partials = []
+  this.currentSwigTemplate = null
+  this.currentDustTemplate = null
 
   // swig dynamic template loader
   swig.setDefaults({ loader: {
@@ -219,24 +276,18 @@ function Adapter( setup ){
     cb(null, embrace.loadPartial(template.partials, name, "dust", template.currentDustTemplate))
   }
 
-  setup && setup(this, embrace)
-}
-Adapter.prototype = {
-  useMustache: false,
-  useHandlebars: false,
-  useSwig: false,
-  useDust: false
+  options.setup && options.setup(this, embrace)
 }
 
 /**
  * @param locations{String[]} a list of partial file paths
  * @param [root]{String} partials root folder
  * */
-Adapter.prototype.addPartials = function ( locations, root ){
+Adapter.prototype.addPartials = function ( locations ){
   locations.forEach(function ( src ){
     var partial = {
       src: src,
-      name: embrace.resolvePartialName(src, root),
+      name: embrace.resolvePartialName(src, this.resolve),
       engine: embrace.detectEngine(src),
       content: null
     }
@@ -260,6 +311,29 @@ Adapter.prototype.addPartials = function ( locations, root ){
       this.partials.push(partial)
     }
   }, this)
+}
+
+Adapter.prototype.getPartialByName = function( name ){
+  var partial = null
+  this.partials.some(function( p ){
+    if ( p.name === name ) {
+      partial = p
+      return true
+    }
+    return false
+  })
+  return partial
+}
+Adapter.prototype.getPartialBySrc = function( src ){
+  var partial = null
+  this.partials.some(function( p ){
+    if ( p.src === src ) {
+      partial = p
+      return true
+    }
+    return false
+  })
+  return partial
 }
 
 /** ====================

@@ -2,34 +2,36 @@ module.exports = function ( grunt ){
 
   grunt.initConfig({
     embrace: {
-//      _options: {
-//        render: true,
-//        compile: false,
-//        data: "test/data/*.json",
-//        partialsRoot: "test/partials/",
-//        partials: "test/partials/**/*.*",
-//        mustache: "test/helpers/mustache/*.js",
-//        handlebars: "test/helpers/handlebars/*.js",
-//        dust: "test/helpers/dust/*.js",
-//        swig: "test/helpers/swig/*.js"
-//      },
       options: {
+        client: "test/embrace/",
         data: "test/data/*.json",
         helpers: "test/helpers/dust/*.js",
         resolve: "test/partials/",
         partials: "**/*.dust",
-        setup: function( adapter, embrace ){
-
+        dust: {
+          helpers: "",
+          client: "test/embrace/"
+        },
+        setup: function( adapter, embrace ){}
+      },
+      compileDust: {
+        options: {compile: true},
+        expand: true,
+        cwd: "test/",
+        src: ["**/*.dust"],
+        dest: "test/compiled/",
+        ext: ".js"
+      },
+      compileAndConcatDust: {
+        options: {
+          compile: true,
+          concat: true
+        },
+        files: {
+          "test/compiled/partials.dust.js": "test/partials/**/*.dust",
+          "test/compiled/templates.dust.js": "test/templates/**/*.dust"
         }
       },
-//      compileDust: {
-//        options: {compile: true},
-//        expand: true,
-//        cwd: "test/templates",
-//        src: ["*.dust"],
-//        dest: "test/compiled/",
-//        ext: ".js"
-//      },
       renderDust: {
         options: {render: true},
         expand: true,
@@ -40,7 +42,10 @@ module.exports = function ( grunt ){
     },
     clean: {
       test: {
-        src:[ "test/rendered/**/*",  "test/compiled/**/*"]
+        src:[
+          "test/rendered/**/*",
+          "test/compiled/**/*"
+        ]
       }
     },
     dir: {
