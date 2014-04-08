@@ -113,26 +113,24 @@ embrace.merge = function ( obj, extension ){
   return ret
 }
 
-embrace.loadPartial = function ( partials, partialName, engine, src ){
+embrace.loadPartial = function ( partials, partialName, engine, src, cache ){
   var content = null
   partials.some(function ( partial ){
     if ( partial.name == partialName && partial.engine == engine ) {
-      if ( partial.content === null ) {
+      if ( !cache || partial.content === null ) {
         content = embrace.read(partial.src)
       }
       if ( content == null ) {
-        console.warn("File not found '" + partial.src + "'")
+        return true
       }
-      else {
-        // make an actual object out of the template string
-        // so it can be passed around by reference
-        // because string primitives would be copied every time
-        // let's hope it doesn't throw off engines
-        // if they only do `typeof x != "string" -> Error..` at some point
-        partial.content = new String(content)
-      }
+      // make an actual object out of the template string
+      // so it can be passed around by reference
+      // because string primitives would be copied every time
+      // let's hope it doesn't throw off engines
+      // if they only do `typeof x != "string" -> Error..` at some point
+      partial.content = new String(content)
     }
-    return content !== null
+    return false
   })
   if ( content == null ) {
     throw new Error("Partial '" + partialName + "' not found in '" + src + "'")
@@ -238,6 +236,7 @@ function Adapter( options ){
   var template = this
 
   this.resolve = options.resolve || ""
+  this.cache = !!options.cache
 
   this.context = {}
   this.partials = []
@@ -253,7 +252,7 @@ function Adapter( options ){
      * @param [cb]{Function} Asynchronous callback function. If not provided, this method should run synchronously.
      * */
     load: function ( identifier, cb ){
-      return embrace.loadPartial(template.partials, identifier, "swig", template.currentSwigTemplate)
+      return embrace.loadPartial(template.partials, identifier, "swig", template.currentSwigTemplate, template.cache)
       // cb(err, content)
     },
     /**
@@ -273,7 +272,7 @@ function Adapter( options ){
   // Override onLoad to specify a fallback loading mechanism
   // (e.g., to load templates from the filesystem or a database).
   dust.onLoad = function ( name, cb ){
-    cb(null, embrace.loadPartial(template.partials, name, "dust", template.currentDustTemplate))
+    cb(null, embrace.loadPartial(template.partials, name, "dust", template.currentDustTemplate, template.cache))
   }
 
   options.setup && options.setup(this, embrace)
