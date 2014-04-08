@@ -119,16 +119,19 @@ embrace.loadPartial = function ( partials, partialName, engine, src, cache ){
     if ( partial.name == partialName && partial.engine == engine ) {
       if ( !cache || partial.content === null ) {
         content = embrace.read(partial.src)
+        if ( content != null ) {
+          // make an actual object out of the template string
+          // so it can be passed around by reference
+          // because string primitives would be copied every time
+          // let's hope it doesn't throw off engines
+          // if they only do `typeof x != "string" -> Error..` at some point
+          partial.content = new String(content)
+        }
       }
-      if ( content == null ) {
-        return true
+      else {
+        content = partial.content
       }
-      // make an actual object out of the template string
-      // so it can be passed around by reference
-      // because string primitives would be copied every time
-      // let's hope it doesn't throw off engines
-      // if they only do `typeof x != "string" -> Error..` at some point
-      partial.content = new String(content)
+      return true
     }
     return false
   })
@@ -273,6 +276,10 @@ function Adapter( options ){
   // (e.g., to load templates from the filesystem or a database).
   dust.onLoad = function ( name, cb ){
     cb(null, embrace.loadPartial(template.partials, name, "dust", template.currentDustTemplate, template.cache))
+  }
+  if ( !template.cache ) {
+    // prevent default dust caching
+    dust.register = function(  ){}
   }
 
   options.setup && options.setup(this, embrace)

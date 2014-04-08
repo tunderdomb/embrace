@@ -19,8 +19,8 @@ module.exports = function ( grunt ){
       client: "",
       render: false,
       compile: false,
+      cache: false,
       data: "",
-      helpers: "",
       resolve: "",
       setup: null
     })

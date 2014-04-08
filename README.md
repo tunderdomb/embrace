@@ -52,7 +52,6 @@ Default: `""`
 
 A directory path where to copy the client side embrace script.
 
-
 #### options.dust.client
 
 Type: `String`
@@ -112,6 +111,15 @@ The pattern is relative to the `resolve` options.
 
 Include/import/partial paths will be looked among these files.
 
+#### options.cache
+
+Type: `Boolean`
+
+Default: `false`
+
+Embrace loads template files once and returns the same content every time it is requested if this option is true.
+False by default, because the main reason of this module is to use it with a watch task.
+
 #### options.setup
 
 Type: `Function`
@@ -129,9 +137,9 @@ A function receiving the template adapter and the embrace object `setup(Adapter 
       options: {
         client: "test/embrace/",
         data: "test/data/*.json",
-        helpers: "test/helpers/dust/*.js",
         resolve: "test/partials/",
         partials: "**/*.dust",
+        cache: false,
         dust: {
           helpers: "",
           client: "test/embrace/"
