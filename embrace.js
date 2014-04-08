@@ -185,12 +185,14 @@ render.dust = function ( src, content, done ){
   var name = path.basename(src, path.extname(src))
   var adapter = this
   adapter.currentDustTemplate = src
-  var tpl = dust.loadSource(dust.compile(content, name))
-  if ( !adapter.cache ) {
-    dust.cache[name] = tpl
-  }
+  dust.loadSource(dust.compile(content, name))
   dust.render(name, adapter.context, function ( err, out ){
     done(err, out)
+    // clear dust cache each time a root template is rendered
+    // because there's no other way r/n to disable caching
+    if ( !adapter.cache ) {
+      dust.cache = {}
+    }
     delete adapter.currentDustTemplate
   })
 }
@@ -280,10 +282,6 @@ function Adapter( options ){
   // (e.g., to load templates from the filesystem or a database).
   dust.onLoad = function ( name, cb ){
     cb(null, embrace.loadPartial(adapter.partials, name, "dust", adapter.currentDustTemplate, adapter.cache))
-  }
-  if ( !adapter.cache ) {
-    // overwrite default dust caching
-    dust.register = function ( name, tmpl ){}
   }
 
   options.setup && options.setup(this, embrace)
