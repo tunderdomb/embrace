@@ -27,14 +27,15 @@ function enginePath( engineName, file ){
   return path.join(__dirname, "engines", engineName, file)
 }
 
-embrace.copyEngine = function( engine, dest ){
+embrace.copyEngine = function ( engine, dest ){
   function doCopy( clientScript ){
     var destScript = path.join(process.cwd(), dest, clientScript)
     if ( !fs.existsSync(destScript) ) {
       copy(enginePath(engine, clientScript), destScript)
     }
   }
-  switch( engine ){
+
+  switch ( engine ) {
     case "mustache":
       break
     case "handlebars":
@@ -52,7 +53,7 @@ embrace.copyEngine = function( engine, dest ){
   }
 }
 
-embrace.copyClient = function( dest ){
+embrace.copyClient = function ( dest ){
   dest = path.join(process.cwd(), dest, "embrace.js")
   if ( !fs.existsSync(dest) ) {
     copy(path.join(__dirname, "dist", "embrace.js"), dest)
@@ -63,7 +64,7 @@ embrace.copyClient = function( dest ){
  * @param src {String}
  * @param [content]{String}
  * */
-embrace.detectEngine = function( src, content ){
+embrace.detectEngine = function ( src, content ){
   src = path.extname(src).replace(".", "")
   content = content || ""
   switch ( true ) {
@@ -94,8 +95,8 @@ embrace.nameOf = function ( src ){
   return path.basename(src, path.extname(src))
 }
 
-embrace.extend = function( obj, extension ){
-  for( var prop in extension ){
+embrace.extend = function ( obj, extension ){
+  for ( var prop in extension ) {
     obj[prop] = extension[prop]
   }
   return obj
@@ -119,7 +120,7 @@ embrace.loadPartial = function ( partials, partialName, engine, src, cache ){
     if ( partial.name == partialName && partial.engine == engine ) {
       if ( !cache || partial.content === null ) {
         content = embrace.read(partial.src)
-        if ( content != null ) {
+        if ( cache && content != null ) {
           // make an actual object out of the template string
           // so it can be passed around by reference
           // because string primitives would be copied every time
@@ -184,7 +185,10 @@ render.dust = function ( src, content, done ){
   var name = path.basename(src, path.extname(src))
   var adapter = this
   adapter.currentDustTemplate = src
-  dust.loadSource(dust.compile(content, name))
+  var tpl = dust.loadSource(dust.compile(content, name))
+  if ( !adapter.cache ) {
+    dust.cache[name] = tpl
+  }
   dust.render(name, adapter.context, function ( err, out ){
     done(err, out)
     delete adapter.currentDustTemplate
@@ -236,7 +240,7 @@ compile.swig = function ( src, content, done ){
  * */
 function Adapter( options ){
   options = options || {}
-  var template = this
+  var adapter = this
 
   this.resolve = options.resolve || ""
   this.cache = !!options.cache
@@ -255,7 +259,7 @@ function Adapter( options ){
      * @param [cb]{Function} Asynchronous callback function. If not provided, this method should run synchronously.
      * */
     load: function ( identifier, cb ){
-      return embrace.loadPartial(template.partials, identifier, "swig", template.currentSwigTemplate, template.cache)
+      return embrace.loadPartial(adapter.partials, identifier, "swig", adapter.currentSwigTemplate, adapter.cache)
       // cb(err, content)
     },
     /**
@@ -275,11 +279,11 @@ function Adapter( options ){
   // Override onLoad to specify a fallback loading mechanism
   // (e.g., to load templates from the filesystem or a database).
   dust.onLoad = function ( name, cb ){
-    cb(null, embrace.loadPartial(template.partials, name, "dust", template.currentDustTemplate, template.cache))
+    cb(null, embrace.loadPartial(adapter.partials, name, "dust", adapter.currentDustTemplate, adapter.cache))
   }
-  if ( !template.cache ) {
-    // prevent default dust caching
-    dust.register = function(  ){}
+  if ( !adapter.cache ) {
+    // overwrite default dust caching
+    dust.register = function ( name, tmpl ){}
   }
 
   options.setup && options.setup(this, embrace)
@@ -319,9 +323,9 @@ Adapter.prototype.addPartials = function ( locations ){
   }, this)
 }
 
-Adapter.prototype.getPartialByName = function( name ){
+Adapter.prototype.getPartialByName = function ( name ){
   var partial = null
-  this.partials.some(function( p ){
+  this.partials.some(function ( p ){
     if ( p.name === name ) {
       partial = p
       return true
@@ -330,9 +334,9 @@ Adapter.prototype.getPartialByName = function( name ){
   })
   return partial
 }
-Adapter.prototype.getPartialBySrc = function( src ){
+Adapter.prototype.getPartialBySrc = function ( src ){
   var partial = null
-  this.partials.some(function( p ){
+  this.partials.some(function ( p ){
     if ( p.src === src ) {
       partial = p
       return true
