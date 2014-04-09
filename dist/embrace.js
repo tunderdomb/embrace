@@ -8,12 +8,10 @@ var embrace = (function ( f ){
     document.head.appendChild(script)
     var ok
     script.onload = function( e ){
-      debugger
       ok || done()
       ok = true
     }
     script.onerror = function( e ){
-      debugger
       ok || done()
       ok = true
     }
